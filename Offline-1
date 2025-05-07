@@ -1,0 +1,92 @@
+#include <stdio.h>
+int main(){
+	int n;
+	scanf("%d",&n);
+	int total_energy = 0;
+	// Loop for tracking rows
+	for(int i=1;i<=n;i++){
+		int k; 
+		scanf("%d",&k);
+		// Declaring variables for tracking the conditions 
+		int energy_level = 0;
+		int active_status = 0;
+		bool prime_active = true;
+		bool palindrome_active = false;
+		bool harmonic = false;
+		bool balanced = false; 
+		int total_sum = 0;
+		int odd_pos_sum = 0;
+		int even_pos_sum = 0;
+		// Loop for taking input of the row elements
+		for(int i=1;i<=k;i++){
+			int x; 
+			scanf("%d",&x);
+			total_sum+=x;
+			if(i%2){
+				odd_pos_sum+=x;
+			}else{
+				even_pos_sum+=x;
+			}
+		}	
+		// Checking balanced or not
+		if(odd_pos_sum==even_pos_sum){
+			balanced = true;
+		}
+		// Checking harmonic or not
+		if((odd_pos_sum-even_pos_sum)%7==0){
+			harmonic = true;
+		}
+		// checking prime or not 
+		if(total_sum==1) prime_active = false;
+
+		for(int i=2;i*i<=total_sum;i++){
+			if(total_sum%i==0){
+				prime_active=false;
+				break;
+			}
+		}
+
+		// Checking palindrome or not
+		int reversed=0;
+		int tmp = total_sum;
+		while(total_sum>0){
+			int reminder = total_sum%10;
+			reversed = reversed*10+reminder;
+			total_sum = total_sum/10; 
+		}
+		if(reversed==tmp){
+			palindrome_active = true;
+		}
+		// Updating energy-level and active-status
+		if(prime_active){
+			energy_level+=5;
+			active_status++;
+		}
+		if(palindrome_active){
+			energy_level+=3;
+			active_status++;
+		}
+		if(harmonic){
+			energy_level+=4;
+			active_status++;
+		}
+		if(balanced){
+			energy_level+=2;
+			active_status++;
+		}
+		// Checking cases of rows 
+		if(active_status==4){
+			printf("Row %d: ULTRA - Energy Level %d\n",i,energy_level);
+		}else if(active_status==3){
+			printf("Row %d: HIGH - Energy Level %d\n",i,energy_level);
+		}else if(active_status==2){
+			printf("Row %d: MEDIUM - Energy Level %d\n",i,energy_level);
+		}else if(active_status==1){
+			printf("Row %d: LOW - Energy Level %d\n",i,energy_level);
+		}else{
+			printf("Row %d: INACTIVE - Energy Level %d\n",i,energy_level);
+		}
+		total_energy+=energy_level;
+	}
+	printf("Total Energy: %d",total_energy);
+}
