@@ -9,7 +9,8 @@
 double array[MAX_SIZE];
 int bin_count[MAX_BINS];
 #define PI 3.14159265358979323846
-double mean,stddev,min,max,size,seed;
+double mean,stddev,min,max,seed;
+int size;
 double max_ans,min_ans,mean_ans=0,stddev_ans=0;
 // Function to generate a normally distributed random number
 double generate_normal(double mu, double sigma) {
@@ -31,6 +32,9 @@ void populate_array_uniform(double *array, int size, double min, double max, uns
     for (int i = 0; i < size; i++) {
         array[i] = min + (double)rand() / ((double)RAND_MAX / (max - min));
     }
+}
+int compare_ints(const void *a, const void *b) {
+    return (*(int *)a - *(int *)b); 
 }
 int main() {
    printf("Commands:\n");
@@ -57,7 +61,7 @@ int main() {
       if(strcmp("set",command)==0){
          flag++;
          printf("Enter number of elements (<= 100000): ");
-         scanf("%lf",&size);
+         scanf("%d",&size);
          printf("Enter seed: ");
          scanf("%lf",&seed);
          char distribution[100];
@@ -94,7 +98,12 @@ int main() {
          for(int i=0;i<size;i++){
             mean_ans+=array[i];
          }
-         mean_ans = mean_ans/size;
+         mean_ans = (double)mean_ans/size;
+         for(int i=0;i<size;i++){
+            stddev_ans+=((array[i]-mean_ans)*(array[i]-mean_ans));
+         }
+         stddev_ans = (double)stddev_ans/(size-1);
+         stddev_ans = sqrt(stddev_ans);
 
       }else if(strcmp("min",command)==0){
          printf("Min       :   %.4lf\n",min_ans);
@@ -102,12 +111,19 @@ int main() {
          printf("Max       :    %.4lf\n",max_ans);
       }else if(strcmp("mean",command)==0){
          printf("Mean      :     %.4lf\n",mean_ans);
-      }else if(strcmp("stddev",command)==0){
-         for(int i=0;i<size;i++){
-            stddev_ans+=abs((array[i]-mean_ans)*(array[i]-mean_ans));
+      }else if(strcmp("median",command)==0){
+          double temp_array[size];
+          for(int i=0;i<size;i++){
+              temp_array[i]=array[i];
+          }
+         qsort(temp_array, size, sizeof(int), compare_ints);
+         if(size%2){
+            printf("Median   :     %.4lf\n",temp_array[(size-1)/2]);
+         }else{
+            printf("Median   :     %.4lf\n",(temp_array[size/2]+array[(size/2)-1])/2);
          }
-         stddev_ans = stddev_ans/size;
-         stddev_ans = sqrt(stddev_ans);
+
+      }else if(strcmp("stddev",command)==0){
          printf("Std Dev   :     %.4lf\n",stddev_ans);
       }else if(strcmp("hist",command)==0){
          printf("Enter number of bins: ");
@@ -118,25 +134,33 @@ int main() {
             printf("Enter number of bins: ");
             scanf("%d",&bin_num);
          }
-         double bin_distance = abs(max_ans-min_ans)/bin_num;
+         double bin_distance = (max_ans-min_ans)/bin_num;
          for(int i=0;i<size;i++){
             int bin_index = (int)((array[i] - min_ans) / bin_distance);
             bin_count[bin_index]++;
          }
+         int max_bincount=0;
+         for(int i=0;i<bin_num;i++){
+            if(max_bincount<bin_count[i]){
+               max_bincount = bin_count[i];
+            }
+         }
          
          double tmp=min_ans;
+
          for(int i=0;i<bin_num;i++){
-            printf("[%.2lf - %.2lf]: ",tmp,(tmp+bin_distance));
+            printf("[%6.2f - %6.2f]: ",tmp,(tmp+bin_distance));
             tmp = tmp+bin_distance;
-            for(int j=0;j<bin_count[i];j++){
+            int stars = (bin_count[i] * MAX_STARS / max_bincount);
+            for(int j=0;j<stars;j++){
                printf("*");
             }
             printf("\n");
          }
 
       }else if(strcmp("summary",command)==0){
-         printf("Min       :   %.4lf\n",min_ans);
-         printf("Max       :    %.4lf\n",max_ans);
+         printf("Min       :     %.4lf\n",min_ans);
+         printf("Max       :     %.4lf\n",max_ans);
          printf("Mean      :     %.4lf\n",mean_ans);
          printf("Std Dev   :     %.4lf\n",stddev_ans);
       }else if(strcmp("help",command)==0){
@@ -160,3 +184,4 @@ int main() {
    }
 
 }
+
