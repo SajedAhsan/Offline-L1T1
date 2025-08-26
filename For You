@@ -1,1 +1,71 @@
-solve for you
+Question 3:
+#include <stdio.h>
+int main() {
+    float x,y,z; 
+    printf("Enter three numbers: ");
+    scanf("%f%f%f",&x,&y,&z);
+    float sum = x + y + z;
+    printf("The sum is = %g\n",sum);
+    printf("The average is = %g",(sum / 3));
+    return 0;
+}
+Question 4:
+#include <stdio.h>
+int main() {
+    int x,y; 
+    printf("Enter length and breadth: ");
+    scanf("%d%d",&x,&y);
+    printf("The area is = %d\n",(x * y));
+    printf("The perimeter is = %d", 2 * (x + y));
+    return 0;
+}
+Question 5:
+#include <stdio.h>
+int main() {
+    float x; 
+    printf("Enter temperature in Celsius: ");
+    scanf("%f",&x);
+    printf("Temperature in Kelvin = %g\n",(x + 273));
+    printf("Temperature in Fahrenheit = %g",(9 * x) /5 + 32);
+    return 0;
+}
+Question 6:
+#include <stdio.h>
+int main() {
+    float r; 
+    printf("Enter radius of the circle: ");
+    scanf("%f",&r);
+    printf("The circumference is = %g\n",(2 * 3.1416 * r));
+    printf("The area is = %g",(3.1416 * r * r));
+    return 0;
+}
+Question 7:
+
+#include <stdio.h>
+int main() {
+    float principal,rate,t; 
+    printf("Enter Principal Rate and Time : ");
+    scanf("%f%f%f",&principal,&rate,&t);
+    if(rate > 1) rate = rate / 100;
+    printf("The interest is = %g",(principal * rate * t));
+    
+}
+Question 8:
+#include <stdio.h>
+int main() {
+    char c;
+    printf("Enter a character : ");
+    scanf("%c",&c);
+    if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u')
+        printf("Character is Vowel\n");
+    else if(c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
+        printf("Character is Vowel\n");
+    else
+        printf("Character is Consonant\n");
+    
+    if(c >= 'a' && c <= 'z')
+        printf("Lower case character");
+    else
+        printf("Upper case character");
+    
+}
