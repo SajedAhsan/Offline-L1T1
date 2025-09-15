@@ -1,71 +1,177 @@
-Question 3:
-#include <stdio.h>
-int main() {
-    float x,y,z; 
-    printf("Enter three numbers: ");
-    scanf("%f%f%f",&x,&y,&z);
-    float sum = x + y + z;
-    printf("The sum is = %g\n",sum);
-    printf("The average is = %g",(sum / 3));
-    return 0;
-}
-Question 4:
-#include <stdio.h>
-int main() {
-    int x,y; 
-    printf("Enter length and breadth: ");
-    scanf("%d%d",&x,&y);
-    printf("The area is = %d\n",(x * y));
-    printf("The perimeter is = %d", 2 * (x + y));
-    return 0;
-}
-Question 5:
-#include <stdio.h>
-int main() {
-    float x; 
-    printf("Enter temperature in Celsius: ");
-    scanf("%f",&x);
-    printf("Temperature in Kelvin = %g\n",(x + 273));
-    printf("Temperature in Fahrenheit = %g",(9 * x) /5 + 32);
-    return 0;
-}
-Question 6:
-#include <stdio.h>
-int main() {
-    float r; 
-    printf("Enter radius of the circle: ");
-    scanf("%f",&r);
-    printf("The circumference is = %g\n",(2 * 3.1416 * r));
-    printf("The area is = %g",(3.1416 * r * r));
-    return 0;
-}
-Question 7:
+#include <bits/stdc++.h>
+using namespace std;
 
-#include <stdio.h>
-int main() {
-    float principal,rate,t; 
-    printf("Enter Principal Rate and Time : ");
-    scanf("%f%f%f",&principal,&rate,&t);
-    if(rate > 1) rate = rate / 100;
-    printf("The interest is = %g",(principal * rate * t));
-    
+void bfs(int start, vector<vector<int>>& adj, int n) {
+    vector<bool> visited(n+1, false);
+    queue<int> q;
+
+    visited[start] = true;
+    q.push(start);
+
+    while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+        cout << node << " ";
+
+        for (int child : adj[node]) {
+            if (!visited[child]) {
+                visited[child] = true;
+                q.push(child);
+            }
+        }
+    }
 }
-Question 8:
-#include <stdio.h>
-int main() {
-    char c;
-    printf("Enter a character : ");
-    scanf("%c",&c);
-    if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u')
-        printf("Character is Vowel\n");
-    else if(c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
-        printf("Character is Vowel\n");
-    else
-        printf("Character is Consonant\n");
-    
-    if(c >= 'a' && c <= 'z')
-        printf("Lower case character");
-    else
-        printf("Upper case character");
-    
+
+void dfs(int start, vector<vector<int>>& adj, int n) {
+    vector<bool> visited(n+1, false);
+    stack<int> st;
+    st.push(start);
+
+    while (!st.empty()) {
+        int node = st.top();
+        st.pop();
+
+        if (!visited[node]) {
+            cout << node << " ";
+            visited[node] = true;
+
+            // push children in reverse so left-most gets visited first
+            for (int i = (int)adj[node].size()-1; i >= 0; i--) {
+                int child = adj[node][i];
+                if (!visited[child]) {
+                    st.push(child);
+                }
+            }
+        }
+    }
 }
+
+int main() {
+    int edges;
+    cout << "Enter number of child-parent pairs: ";
+    cin >> edges;
+
+    vector<pair<int,int>> cp(edges);
+    int maxNode = 0;
+    set<int> children, parents;
+
+    cout << "Enter pairs (child parent):\n";
+    for (int i = 0; i < edges; i++) {
+        int child, parent;
+        cin >> child >> parent;
+        cp[i] = {child, parent};
+        maxNode = max({maxNode, child, parent});
+        children.insert(child);
+        parents.insert(parent);
+    }
+
+    vector<vector<int>> adj(maxNode+1);
+
+    // build adjacency list (parent -> child)
+    for (auto [child, parent] : cp) {
+        adj[parent].push_back(child);
+    }
+
+    // root = node that never appears as a child
+    int root = -1;
+    for (int node : parents) {
+        if (!children.count(node)) {
+            root = node;
+            break;
+        }
+    }
+
+    if (root == -1) {
+        cout << "No root found!\n";
+        return 0;
+    }
+
+    cout << "Root detected: " << root << "\n";
+
+    cout << "BFS traversal: ";
+    bfs(root, adj, maxNode);
+    cout << "\nDFS traversal: ";
+    dfs(root, adj, maxNode);
+    cout << "\n";
+
+    return 0;
+}
+
+
+
+#solve
+
+#include <bits/stdc++.h>
+using namespace std;
+
+const int INF = 1e9;
+int vis[8][8], lev[8][8];
+
+int getX(string s) {
+    return s[0] - 'a';
+}
+
+int getY(string s) {
+    return s[1] - '1';
+}
+
+bool isValid(int x, int y) {
+    return x >= 0 && y >= 0 && x < 8 && y < 8;
+}
+
+vector<pair<int,int>> movements = {
+    {-1, 2}, {1, 2},
+    {-1, -2}, {1, -2},
+    {2, -1}, {2, 1},
+    {-2, -1}, {-2, 1}
+};
+
+int bfs(string source, string dest) {
+    int sourceX = getX(source);
+    int sourceY = getY(source);
+    int destX = getX(dest);
+    int destY = getY(dest);
+
+
+    for(int i = 0; i < 8; ++i)
+        for(int j = 0; j < 8; ++j) {
+            vis[i][j] = 0;
+            lev[i][j] = INF;
+        }
+
+    queue<pair<int,int>> q;
+    q.push({sourceX, sourceY});
+    vis[sourceX][sourceY] = 1;
+    lev[sourceX][sourceY] = 0;
+
+    while(!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+
+        for(auto [dx, dy] : movements) {
+            int childX = x + dx;
+            int childY = y + dy;
+
+            if (!isValid(childX, childY)) continue;
+            if (!vis[childX][childY]) {
+                q.push({childX, childY});
+                lev[childX][childY] = lev[x][y] + 1;
+                vis[childX][childY] = 1;
+            }
+        }
+    }
+
+    return lev[destX][destY];
+}
+
+int main() {
+    int T;
+    cin >> T;
+    while(T--) {
+        string start, dest;
+        cin >> start >> dest;
+        cout << bfs(start, dest) << endl;
+    }
+    return 0;
+}
+
