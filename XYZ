@@ -1,177 +1,74 @@
-#include <bits/stdc++.h>
-using namespace std;
+// power 
+long long binpow(long long a, long long b, long long mod) {
+    if (b == 0) return 1 % mod;
+    long long half = binpow(a, b / 2, mod);
+    long long res = (half * half) % mod;
+    if (b % 2) res = (res * a) % mod;
+    return res;
+}
+// sieve 
+vector<int> sieve(int n) {
+    vector<int> primes;
+    vector<bool> is_prime(n + 1, true);
 
-void bfs(int start, vector<vector<int>>& adj, int n) {
-    vector<bool> visited(n+1, false);
-    queue<int> q;
+    is_prime[0] = is_prime[1] = false;
 
-    visited[start] = true;
-    q.push(start);
+    for (int i = 2; i * i <= n; i++) {
+        if (is_prime[i]) {
+            for (int j = i * i; j <= n; j += i)
+                is_prime[j] = false;
+        }
+    }
 
-    while (!q.empty()) {
-        int node = q.front();
-        q.pop();
-        cout << node << " ";
+    for (int i = 2; i <= n; i++) {
+        if (is_prime[i])
+            primes.push_back(i);
+    }
 
-        for (int child : adj[node]) {
-            if (!visited[child]) {
-                visited[child] = true;
-                q.push(child);
+    return primes;
+}
+// factorization 
+const int N = 1000000; // limit
+int spf[N + 1]; // spf[x] = smallest prime factor of x
+
+void sieve_spf() {
+    for (int i = 1; i <= N; i++) spf[i] = i;
+
+    for (int i = 2; i * i <= N; i++) {
+        if (spf[i] == i) { // i is prime
+            for (int j = i * i; j <= N; j += i)
+                if (spf[j] == j) spf[j] = i;
+        }
+    }
+}
+vector<int> getFactors(int x) {
+    vector<int> factors;
+    while (x != 1) {
+        factors.push_back(spf[x]);
+        x /= spf[x];
+    }
+    return factors;
+}
+// Phi
+void calc_phi(int n, vector<long long>& phi) {
+    phi.resize(n + 1);
+    for (int i = 1; i <= n; i++) phi[i] = i;
+
+    for (int i = 2; i <= n; i++) {
+        if (phi[i] == i) { // i is prime
+            for (int j = i; j <= n; j += i) {
+                phi[j] -= phi[j] / i;
             }
         }
     }
 }
+// F
+void calc_F(int n, const vector<long long>& phi, vector<long long>& F) {
+    F.assign(n + 1, 0);
 
-void dfs(int start, vector<vector<int>>& adj, int n) {
-    vector<bool> visited(n+1, false);
-    stack<int> st;
-    st.push(start);
-
-    while (!st.empty()) {
-        int node = st.top();
-        st.pop();
-
-        if (!visited[node]) {
-            cout << node << " ";
-            visited[node] = true;
-
-            // push children in reverse so left-most gets visited first
-            for (int i = (int)adj[node].size()-1; i >= 0; i--) {
-                int child = adj[node][i];
-                if (!visited[child]) {
-                    st.push(child);
-                }
-            }
+    for (int i = 1; i <= n; i++) {
+        for (int j = i; j <= n; j += i) {
+            F[j] += 1LL * i * phi[j / i];
         }
     }
 }
-
-int main() {
-    int edges;
-    cout << "Enter number of child-parent pairs: ";
-    cin >> edges;
-
-    vector<pair<int,int>> cp(edges);
-    int maxNode = 0;
-    set<int> children, parents;
-
-    cout << "Enter pairs (child parent):\n";
-    for (int i = 0; i < edges; i++) {
-        int child, parent;
-        cin >> child >> parent;
-        cp[i] = {child, parent};
-        maxNode = max({maxNode, child, parent});
-        children.insert(child);
-        parents.insert(parent);
-    }
-
-    vector<vector<int>> adj(maxNode+1);
-
-    // build adjacency list (parent -> child)
-    for (auto [child, parent] : cp) {
-        adj[parent].push_back(child);
-    }
-
-    // root = node that never appears as a child
-    int root = -1;
-    for (int node : parents) {
-        if (!children.count(node)) {
-            root = node;
-            break;
-        }
-    }
-
-    if (root == -1) {
-        cout << "No root found!\n";
-        return 0;
-    }
-
-    cout << "Root detected: " << root << "\n";
-
-    cout << "BFS traversal: ";
-    bfs(root, adj, maxNode);
-    cout << "\nDFS traversal: ";
-    dfs(root, adj, maxNode);
-    cout << "\n";
-
-    return 0;
-}
-
-
-
-#solve
-
-#include <bits/stdc++.h>
-using namespace std;
-
-const int INF = 1e9;
-int vis[8][8], lev[8][8];
-
-int getX(string s) {
-    return s[0] - 'a';
-}
-
-int getY(string s) {
-    return s[1] - '1';
-}
-
-bool isValid(int x, int y) {
-    return x >= 0 && y >= 0 && x < 8 && y < 8;
-}
-
-vector<pair<int,int>> movements = {
-    {-1, 2}, {1, 2},
-    {-1, -2}, {1, -2},
-    {2, -1}, {2, 1},
-    {-2, -1}, {-2, 1}
-};
-
-int bfs(string source, string dest) {
-    int sourceX = getX(source);
-    int sourceY = getY(source);
-    int destX = getX(dest);
-    int destY = getY(dest);
-
-
-    for(int i = 0; i < 8; ++i)
-        for(int j = 0; j < 8; ++j) {
-            vis[i][j] = 0;
-            lev[i][j] = INF;
-        }
-
-    queue<pair<int,int>> q;
-    q.push({sourceX, sourceY});
-    vis[sourceX][sourceY] = 1;
-    lev[sourceX][sourceY] = 0;
-
-    while(!q.empty()) {
-        auto [x, y] = q.front();
-        q.pop();
-
-        for(auto [dx, dy] : movements) {
-            int childX = x + dx;
-            int childY = y + dy;
-
-            if (!isValid(childX, childY)) continue;
-            if (!vis[childX][childY]) {
-                q.push({childX, childY});
-                lev[childX][childY] = lev[x][y] + 1;
-                vis[childX][childY] = 1;
-            }
-        }
-    }
-
-    return lev[destX][destY];
-}
-
-int main() {
-    int T;
-    cin >> T;
-    while(T--) {
-        string start, dest;
-        cin >> start >> dest;
-        cout << bfs(start, dest) << endl;
-    }
-    return 0;
-}
-
