@@ -1,3 +1,18 @@
+// long long gcd and lcm
+long long gcdLL(long long a, long long b) {
+    while (b) {
+        long long t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
+long long lcmLL(long long a, long long b) {
+    return a / gcdLL(a, b) * b;
+}
+
+
 // power 
 long long binpow(long long a, long long b, long long mod) {
     if (b == 0) return 1 % mod;
@@ -71,4 +86,23 @@ void calc_F(int n, const vector<long long>& phi, vector<long long>& F) {
             F[j] += 1LL * i * phi[j / i];
         }
     }
+}
+// nCr
+const int MAXN = 1e6;
+long long fact[MAXN], invfact[MAXN];
+const long long MOD = 1e9+7;
+
+void init() {
+    fact[0] = 1;
+    for (int i = 1; i < MAXN; i++)
+        fact[i] = fact[i-1] * i % MOD;
+
+    invfact[MAXN-1] = modpow(fact[MAXN-1], MOD-2, MOD);
+    for (int i = MAXN-2; i >= 0; i--)
+        invfact[i] = invfact[i+1] * (i+1) % MOD;
+}
+
+long long nCr(int n, int r) {
+    if (r < 0 || r > n) return 0;
+    return fact[n] * invfact[r] % MOD * invfact[n-r] % MOD;
 }
